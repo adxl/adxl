@@ -1,2 +1,26 @@
-- name: Profile Readme Stats
-  uses: teoxoy/profile-readme-stats@v1
+on:
+  schedule:
+    - cron: '0 */12 * * *'
+  push:
+    branches:
+      - master
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Generate README.md
+      uses: teoxoy/profile-readme-stats@v1
+      with:
+        token: 0243eeae829988ce84900ff5357a6c83f9a2bf66
+    - name: Update README.md
+      run: |
+        if [[ "$(git status --porcelain)" != "" ]]; then
+        git config user.name github-actions[bot]
+        git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+        git add .
+        git commit -m "Update README"
+        git push
+        fi
